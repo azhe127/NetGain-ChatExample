@@ -8,11 +8,11 @@ using StackExchange.NetGain;
 
 namespace NetGain
 {
-    internal class TobitTcpServer : TcpServer
+    internal class ChatTcpServer : TcpServer
     {
         public static Dictionary<Guid, User> Connections = new Dictionary<Guid, User>(); 
 
-        public TobitTcpServer(int concurrentOperations) : base(concurrentOperations)
+        public ChatTcpServer(int concurrentOperations) : base(concurrentOperations)
         {}
         public override void OnReceived(Connection connection, object value)
         {
@@ -52,7 +52,7 @@ namespace NetGain
 
                     Broadcast(JsonConvert.SerializeObject(new Message<List<User>>()
                     {
-                        Data = TobitTcpServer.Connections.Where(pair => pair.Value.Connection.IsAlive).Select(pair => pair.Value).ToList(),
+                        Data = ChatTcpServer.Connections.Where(pair => pair.Value.Connection.IsAlive).Select(pair => pair.Value).ToList(),
                         Type = MessageType.USER_UPDATE
                     }));
 
@@ -65,7 +65,7 @@ namespace NetGain
             base.OnAfterAuthenticate(connection);
 
             connection.UserToken = Guid.NewGuid();
-            TobitTcpServer.Connections.Add((Guid)connection.UserToken, new User()
+            ChatTcpServer.Connections.Add((Guid)connection.UserToken, new User()
             {
                 Id = (Guid) connection.UserToken,
                 Connection = connection
